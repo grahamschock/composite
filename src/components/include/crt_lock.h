@@ -11,52 +11,46 @@
 #include <crt_blkpt.h>
 
 struct crt_lock {
-    unsigned long owner;
+    unsigned long    owner;
     struct crt_blkpt blkpt;
 };
 
 struct crt_sem {
-  unsigned long count;
-  unsigned long max_threads;
-  struct crt_blkpt blkpt;
+    unsigned long    count;
+    unsigned long    max_threads;
+    struct crt_blkpt blkpt;
 };
 
 static inline void
 crt_sem_up(struct crt_sem *s)
 {
-  struct crt_blkpt_checkpoint chkpt;
+    struct crt_blkpt_checkpoint chkpt;
 
-  long unsigned int thd_num_cur = ps_faa(&s->count, 1);
+    long unsigned int thd_num_cur = ps_faa(&s->count, 1);
 
-  while(1)
-    {
-      crt_blkpt_checkpoint(&s->blkpt, &chkpt);
+    while (1) {
+        crt_blkpt_checkpoint(&s->blkpt, &chkpt);
 
-      if(s->count >= s->max_threads)
-        {
-          return;
-        }
-      crt_blkpt_wait(&s->blkpt, 0, &chkpt);
+        if (s->count < s->max_threads) { return; }
+        crt_blkpt_wait (&s->blkpt, 0, &chkpt);
     }
 }
 
 static inline void
 crt_sem_alloc(struct crt_sem *s, int size)
 {
-
-  s->max_threads = size;
-  s->count = 0;
+    s->max_threads = size;
+    s->count       = 0;
 }
 
 static inline void
 crt_sem_down(struct crt_sem *s)
 {
-  struct crt_blkpt_checkpoint chkpt;
+    struct crt_blkpt_checkpoint chkpt;
 
-  long unsigned int thd_num_cur = ps_faa(&s->count, -1);
+    long unsigned int thd_num_cur = ps_faa(&s->count, -1);
 
-  crt_blkpt_trigger(&s->blkpt, 0);
-
+    crt_blkpt_trigger(&s->blkpt, 0);
 }
 
 static inline int
@@ -83,9 +77,7 @@ crt_lock_take(struct crt_lock *l)
     while (1) {
         crt_blkpt_checkpoint(&l->blkpt, &chkpt);
 
-        if (ps_cas(&l->owner, 0, (unsigned long)cos_thdid())) {
-            return;	/* success! */
-        }
+        if (ps_cas(&l->owner, 0, (unsigned long)cos_thdid())) { return; /* success! */ }
         /* failure: try and block */
         crt_blkpt_wait(&l->blkpt, 0, &chkpt);
     }
