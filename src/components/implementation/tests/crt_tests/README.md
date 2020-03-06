@@ -119,10 +119,10 @@ We will have a thread preempt another thread using thd_yield().
 
 Pseudocode
 ```
-set up a checkpoint on a thread
-preempt said thread using thd_yield()
-wake up all thds
-switch to thd original thd
-block thd (no one will wake this thd up)
+- set up a checkpoint on a thread
+- preempt said thread using thd_yield()
+- wake up all thds
+- switch to thd original thd
+- block thd (no one will wake this thd up)
 
 ```
