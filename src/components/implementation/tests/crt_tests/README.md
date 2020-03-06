@@ -108,4 +108,4 @@ The event count/block point is an abstraction to synchronize the
    operations when triggering there are blocked threads, the user of
    this API can trigger whenever transitioning back to S0.
   ```
-- [ ]
+- []
