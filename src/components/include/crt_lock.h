@@ -31,13 +31,13 @@ crt_sem_up(struct crt_sem *s)
     while (1) {
         crt_blkpt_checkpoint(&s->blkpt, &chkpt);
 
-        if (s->count < s->max_threads) { return; }
+        if (s->count < s->max_threads) return;
         crt_blkpt_wait (&s->blkpt, 0, &chkpt);
     }
 }
 
 static inline void
-crt_sem_alloc(struct crt_sem *s, int size)
+crt_sem_init(struct crt_sem *s, int size)
 {
     s->max_threads = size;
     s->count       = 0;
