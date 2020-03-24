@@ -248,8 +248,6 @@ blk_thd(void *d)
         me = i;
     }
     assert(me != -1);
-
-    
     
     /* set up a checkoint */
     crt_blkpt_checkpoint(&blkpt, &chkpt);
@@ -277,13 +275,10 @@ test_blkpt(void)
 {
     int                     i;
     union sched_param_union sps[] = {{.c = {.type = SCHEDP_PRIO, .value = 5}}};
-
-    printc("Create threads:\n");
-    for (i = 0; i < 1; i++) {
-        blk_thds[i] = sl_thd_alloc(blk_thd, NULL);
-        printc("\tcreating thread %d at prio %d\n", sl_thd_thdid(blk_thds[i]), sps[i].c.value);
-        sl_thd_param_set(blk_thds[i], sps[i].v);
-    }
+    printc("Create thread:\n");
+    blk_thds[0] = sl_thd_alloc(blk_thd, NULL);
+    printc("\tcreating thread %d at prio %d\n", sl_thd_thdid(blk_thds[0]), sps[0].c.value);
+    sl_thd_param_set(blk_thds[0], sps[0].v);
 }
 
 void
