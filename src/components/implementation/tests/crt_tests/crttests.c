@@ -232,6 +232,8 @@ struct sl_thd *blk_thds[NBLKTHDS] = {
   NULL,
 };
 
+int progress_shared = 0;
+
 void
 blk_thd(void *d)
 {
@@ -240,29 +242,30 @@ blk_thd(void *d)
 
     int i, cnt, me = -1;
 
-    for (i = 0; i < NLOCKTHDS; i++) {
+    for (i = 0; i < 1; i++) {
         if (sl_thd_thdid(blk_thds[i]) != cos_thdid()) continue;
 
         me = i;
     }
     assert(me != -1);
 
-    /* wake up all threads */
-    crt_blkpt_trigger(&blkpt, 0);
-
+    
+    
     /* set up a checkoint */
     crt_blkpt_checkpoint(&blkpt, &chkpt);
 
-    /* prempt thread */
-    sl_thd_yield(sl_thd_thdid(blk_thds[1]));
+    crt_blkpt_trigger(&blkpt, 0);
 
-    /* go back to original thread */
-    sl_thd_yield(sl_thd_thdid(blk_thds[0]));
+    crt_blkpt_checkpoint(&blkpt, &chkpt);
 
-    /* block and hopefully someone should wake us up */
-    crt_blkpt_wait(&blkpt, 0, &chkpt);
+    if(blkpt.epoch_blocked != chkpt.epoch_blocked)
+      {
+	printc("FAILURE");
+      }
+    else{
+      printc("SUCCESS");
+    }
 
-    if (me == 0) printc("SUCCESS");
     while (1)
         ;
 }
@@ -272,13 +275,10 @@ void
 test_blkpt(void)
 {
     int                     i;
-    union sched_param_union sps[] = {{.c = {.type = SCHEDP_PRIO, .value = 5}},
-                                     {.c = {.type = SCHEDP_PRIO, .value = 6}},
-                                     {.c = {.type = SCHEDP_PRIO, .value = 6}},
-                                     {.c = {.type = SCHEDP_PRIO, .value = 7}}};
+    union sched_param_union sps[] = {{.c = {.type = SCHEDP_PRIO, .value = 5}}};
 
     printc("Create threads:\n");
-    for (i = 0; i < NBLKTHDS; i++) {
+    for (i = 0; i < 1; i++) {
         blk_thds[i] = sl_thd_alloc(blk_thd, NULL);
         printc("\tcreating thread %d at prio %d\n", sl_thd_thdid(blk_thds[i]), sps[i].c.value);
         sl_thd_param_set(blk_thds[i], sps[i].v);
