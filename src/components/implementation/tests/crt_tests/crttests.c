@@ -258,6 +258,7 @@ blk_thd(void *d)
 
     crt_blkpt_checkpoint(&blkpt, &chkpt);
 
+    /* there is no thread to preempt us so these should be the same */
     if(blkpt.epoch_blocked != chkpt.epoch_blocked)
       {
 	printc("FAILURE");
