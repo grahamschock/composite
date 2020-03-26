@@ -227,59 +227,113 @@ test_lock(void)
     }
 }
 
-#define NBLKTHDS 4
-struct sl_thd *blk_thds[NBLKTHDS] = {
+struct sl_thd *blk_thds1[1] = {
   NULL,
 };
 
+struct sl_thd *blk_thds2[2] = {
+  NULL,
+};
+
+
 int progress_shared = 0;
 
+struct crt_blkpt            blkpt_test_1;
+struct crt_blkpt            blkpt_test_2;
+
 void
-blk_thd(void *d)
+blk_thd1(void *d)
 {
-    struct crt_blkpt_checkpoint chkpt;
-    struct crt_blkpt            blkpt;
+
 
     int i, cnt, me = -1;
 
     for (i = 0; i < 1; i++) {
-        if (sl_thd_thdid(blk_thds[i]) != cos_thdid()) continue;
+        if (sl_thd_thdid(blk_thds1[i]) != cos_thdid()) continue;
 
         me = i;
     }
     assert(me != -1);
+
+    struct crt_blkpt_checkpoint chkpt;
     
     /* set up a checkoint */
-    crt_blkpt_checkpoint(&blkpt, &chkpt);
+    crt_blkpt_checkpoint(&blkpt_test_1, &chkpt);
 
-    crt_blkpt_trigger(&blkpt, 0);
-
-    crt_blkpt_checkpoint(&blkpt, &chkpt);
+    /* wake up all threads */
+    crt_blkpt_trigger(&blkpt_test_1, 0);
 
     /* there is no thread to preempt us so these should be the same */
-    if(blkpt.epoch_blocked != chkpt.epoch_blocked)
-      {
+    if(blkpt_test_1.epoch_blocked != chkpt.epoch_blocked) {
 	printc("FAILURE");
+	while(1)
+	  ;
       }
-    else{
-      printc("SUCCESS");
-    }
 
+    printc("SUCCESS!");
     while (1)
         ;
 }
+void
+blk_thd2(void *d)
+{
+    struct crt_blkpt_checkpoint chkpt;
+    
+    /* set up a checkoint */
+    crt_blkpt_checkpoint(&blkpt_test_2, &chkpt);
 
+    crt_blkpt_trigger(&blkpt_test_2, 0);
+
+    crt_blkpt_wait(&blkpt_test_2, 0, &chkpt);
+
+    progress_shared++;
+
+    while(1);
+}
 
 void
-test_blkpt(void)
+blk_thd3(void *d)
+{
+  if(progress_shared == 0)
+    {
+      printc("Failure");
+      while(1);
+    }
+  printc("Success!");
+  while(1);
+}
+  
+void
+test_blkpt1(void)
 {
     int                     i;
     union sched_param_union sps[] = {{.c = {.type = SCHEDP_PRIO, .value = 5}}};
+    crt_blkpt_init(&blkpt_test_1);
     printc("Create thread:\n");
-    blk_thds[0] = sl_thd_alloc(blk_thd, NULL);
-    printc("\tcreating thread %d at prio %d\n", sl_thd_thdid(blk_thds[0]), sps[0].c.value);
-    sl_thd_param_set(blk_thds[0], sps[0].v);
+    blk_thds1[0] = sl_thd_alloc(blk_thd1, NULL);
+    printc("\tcreating thread %d at prio %d\n", sl_thd_thdid(blk_thds1[0]), sps[0].c.value);
+    sl_thd_param_set(blk_thds1[0], sps[0].v);
+    
+    
 }
+
+void
+test_blkpt2(void)
+{
+    int                     i;
+    union sched_param_union sps[] = {{.c = {.type = SCHEDP_PRIO, .value = 7}},
+                                     {.c = {.type = SCHEDP_PRIO, .value = 6}}};
+    crt_blkpt_init(&blkpt_test_2);
+    printc("Create thread:\n");
+    blk_thds2[0] = sl_thd_alloc(blk_thd2, NULL);
+    blk_thds2[1] = sl_thd_alloc(blk_thd3, NULL);
+    printc("\tcreating thread %d at prio %d\n", sl_thd_thdid(blk_thds2[0]), sps[0].c.value);
+    printc("\tcreating thread %d at prio %d\n", sl_thd_thdid(blk_thds2[1]), sps[1].c.value);
+    sl_thd_param_set(blk_thds2[0], sps[0].v);
+    sl_thd_param_set(blk_thds2[1], sps[1].v);
+    
+}
+
 
 void
 cos_init(void)
@@ -295,7 +349,8 @@ cos_init(void)
     // test_lock();
     //	test_chan();
 
-    test_blkpt();
+    //    test_blkpt1();
+    test_blkpt2();  
 
     printc("Running benchmark...\n");
     sl_sched_loop_nonblock();
