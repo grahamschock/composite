@@ -235,11 +235,18 @@ struct sl_thd *blk_thds2[2] = {
   NULL,
 };
 
+struct sl_thd *blk_thds3[2] = {
+  NULL,
+};
+
+
 
 int progress_shared = 0;
 
 struct crt_blkpt            blkpt_test_1;
 struct crt_blkpt            blkpt_test_2;
+struct crt_blkpt            blkpt_test_3;
+
 
 void
 blk_thd1(void *d)
@@ -247,7 +254,7 @@ blk_thd1(void *d)
 
 
     int i, cnt, me = -1;
-
+    //put this into function
     for (i = 0; i < 1; i++) {
         if (sl_thd_thdid(blk_thds1[i]) != cos_thdid()) continue;
 
@@ -262,6 +269,8 @@ blk_thd1(void *d)
 
     /* wake up all threads */
     crt_blkpt_trigger(&blkpt_test_1, 0);
+
+    //check API behavior in code
 
     /* there is no thread to preempt us so these should be the same */
     if(blkpt_test_1.epoch_blocked != chkpt.epoch_blocked) {
@@ -285,8 +294,10 @@ blk_thd2(void *d)
     crt_blkpt_trigger(&blkpt_test_2, 0);
 
     crt_blkpt_wait(&blkpt_test_2, 0, &chkpt);
-
+    
     progress_shared++;
+
+    sl_thd_yield(sl_thd_thdid(blk_thds2[1]));
 
     while(1);
 }
@@ -294,15 +305,44 @@ blk_thd2(void *d)
 void
 blk_thd3(void *d)
 {
-  if(progress_shared == 0)
-    {
+  if(progress_shared == 0) {
       printc("Failure");
       while(1);
     }
   printc("Success!");
   while(1);
 }
-  
+
+void
+blk_thd4(void *d)
+{
+  struct crt_blkpt_checkpoint chkpt;
+
+  crt_blkpt_checkpoint(&blkpt_test_3, &chkpt);
+
+  crt_blkpt_wait(&blkpt_test_3, 0, &chkpt);
+
+  progress_shared++;
+
+  sl_thd_yield(sl_thd_thdid(blk_thds3[1]));
+
+  while(1);
+
+}
+
+void
+blk_thd5(void *d)
+{
+  if(progress_shared == 0) {
+      printc("Success!");
+      while(1);
+    }
+  printc("Failure");
+  while(1);
+}
+
+
+
 void
 test_blkpt1(void)
 {
@@ -321,8 +361,10 @@ void
 test_blkpt2(void)
 {
     int                     i;
-    union sched_param_union sps[] = {{.c = {.type = SCHEDP_PRIO, .value = 7}},
-                                     {.c = {.type = SCHEDP_PRIO, .value = 6}}};
+    union sched_param_union sps[] = {{.c = {.type = SCHEDP_PRIO, .value = 6}},
+                                     {.c = {.type = SCHEDP_PRIO, .value = 7}}};
+
+    progress_shared = 0;
     crt_blkpt_init(&blkpt_test_2);
     printc("Create thread:\n");
     blk_thds2[0] = sl_thd_alloc(blk_thd2, NULL);
@@ -333,6 +375,26 @@ test_blkpt2(void)
     sl_thd_param_set(blk_thds2[1], sps[1].v);
     
 }
+
+void
+test_blkpt3(void)
+{
+    int                     i;
+    union sched_param_union sps[] = {{.c = {.type = SCHEDP_PRIO, .value = 6}},
+                                     {.c = {.type = SCHEDP_PRIO, .value = 7}}};
+
+    progress_shared = 0;
+    crt_blkpt_init(&blkpt_test_3);
+    printc("Create thread:\n");
+    blk_thds3[0] = sl_thd_alloc(blk_thd4, NULL);
+    blk_thds3[1] = sl_thd_alloc(blk_thd5, NULL);
+    printc("\tcreating thread %d at prio %d\n", sl_thd_thdid(blk_thds3[0]), sps[0].c.value);
+    printc("\tcreating thread %d at prio %d\n", sl_thd_thdid(blk_thds3[1]), sps[1].c.value);
+    sl_thd_param_set(blk_thds3[0], sps[0].v);
+    sl_thd_param_set(blk_thds3[1], sps[1].v);
+    
+}
+
 
 
 void
@@ -350,7 +412,8 @@ cos_init(void)
     //	test_chan();
 
     //    test_blkpt1();
-    test_blkpt2();  
+    //    test_blkpt2();
+    test_blkpt3();
 
     printc("Running benchmark...\n");
     sl_sched_loop_nonblock();
