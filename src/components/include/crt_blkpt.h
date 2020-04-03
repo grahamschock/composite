@@ -128,6 +128,7 @@ struct crt_blkpt_checkpoint {
 typedef enum {
 	CRT_BLKPT_UNIPROC   = 1, 	/* are the event operations only called on a single core? */
 	CRT_BLKPT_CRIT_SECT = 2,	/* is only one thread ever going to trigger at a time? */
+	CRT_BLKPT_WAKE_ALL = 4
 } crt_blkpt_flags_t;
 
 #define CRT_BLKPT_EPOCH_BLKED_BITS (sizeof(sched_blkpt_epoch_t) * 8)
@@ -158,6 +159,7 @@ crt_blkpt_teardown(struct crt_blkpt *blkpt)
 	return sched_blkpt_free(blkpt->id);
 }
 
+//returns IF updated chkpt and unmasks block value 
 /* Internal APIs that must be inlined to remove the branches */
 static inline int
 __crt_blkpt_atomic_trigger(sched_blkpt_epoch_t *ec, sched_blkpt_epoch_t chkpt, crt_blkpt_flags_t flags)
@@ -229,11 +231,18 @@ crt_blkpt_trigger(struct crt_blkpt *blkpt, crt_blkpt_flags_t flags)
 	 * as constants. That way they will be inlined the conditions
 	 * in the *_atomic_* function will be removed.
 	 */
-	sched_blkpt_epoch_t saved = ps_load(&blkpt->epoch_blocked);
+
+        sched_blkpt_epoch_t saved = ps_load(&blkpt->epoch_blocked);
 
 	/* The optimization: don't increment events if noone's listening */
-	if (likely(!CRT_BLKPT_BLKED(saved))) return;
+	while (likely(!CRT_BLKPT_BLKED(saved))) {
+	  
+	    saved = ps_load(&blkpt->epoch_blocked);
+	    if (!__crt_blkpt_atomic_trigger(&blkpt->epoch_blocked, saved, flags)) continue;
+	    return;
 
+	  }
+	
 	/* slow(er) path for when we have blocked threads */
 	if (!__crt_blkpt_atomic_trigger(&blkpt->epoch_blocked, saved, flags)) {
 		/*
@@ -250,7 +259,12 @@ crt_blkpt_trigger(struct crt_blkpt *blkpt, crt_blkpt_flags_t flags)
 	 * = max(epoch, ...) (for some wraparound-aware version of
 	 * max).
 	 */
-	sched_blkpt_trigger(blkpt->id, CRT_BLKPT_EPOCH(saved + 1), 0);
+	if (flags & CRT_BLKPT_WAKE_ALL) {
+	        sched_blkpt_trigger(blkpt->id, CRT_BLKPT_EPOCH(saved + 1), 0);
+	  } else {
+	        sched_blkpt_trigger(blkpt->id, CRT_BLKPT_EPOCH(saved + 1), 1);
+	  }
+	  
 }
 
 /* Wake only a single, specified thread (tracked manually in the data-structure) */

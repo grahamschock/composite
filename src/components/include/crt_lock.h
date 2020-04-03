@@ -53,6 +53,13 @@ crt_sem_down(struct crt_sem *s)
     crt_blkpt_trigger(&s->blkpt, 0);
 }
 
+/* static inline void */
+/* crt_mutex_init(struct crt_mutex *m) */
+/* { */
+  
+/* } */
+
+
 static inline int
 crt_lock_init(struct crt_lock *l)
 {
