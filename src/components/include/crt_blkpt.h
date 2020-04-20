@@ -242,44 +242,14 @@ crt_blkpt_trigger(struct crt_blkpt *blkpt, crt_blkpt_flags_t flags)
 	 */
 
 
-	    do {
-	    	saved = ps_load(&blkpt->epoch_blocked);
-	    } while (!__crt_blkpt_atomic_trigger(&blkpt->epoch_blocked, saved, flags));
-	    if(likely(!CRT_BLKPT_BLKED(saved))) return;
+	do {
+		saved = ps_load(&blkpt->epoch_blocked);
+	} while (!__crt_blkpt_atomic_trigger(&blkpt->epoch_blocked, saved, flags));
 
+	if (likely(!CRT_BLKPT_BLKED(saved))) return;
 
-
-
-
-	/*
-	while (likely(!CRT_BLKPT_BLKED(saved))) {
-	        saved = ps_load(&blkpt->epoch_blocked);
-	        if (!__crt_blkpt_atomic_trigger(&blkpt->epoch_blocked, saved, flags)) continue;
-	        return;
-	}
-
-	 slow(er) path for when we have blocked threads
-	if (!__crt_blkpt_atomic_trigger(&blkpt->epoch_blocked, saved, flags)) {
-	        *
-	         * Race here between triggering threads. In this case,
-	         * someone else already incremented the epoch and
-	         * unblocked the threads. Yeah, helping algorithms!
-	         *
-	        return;
-	}
-	*
-	 * Note that there is a race here. Multiple threads triggering
-	 * events might pass different epochs down to the next
-	 * level. This is OK as the next level always takes the epoch
-	 * = max(epoch, ...) (for some wraparound-aware version of
-	 * max).
-	 *
-	*/
-	    wake_single = (flags & CRT_BLKPT_WAKE_ALL) == 0; 
-	    sched_blkpt_trigger(blkpt->id, CRT_BLKPT_EPOCH(saved + 1), wake_single);
-	    
-
-	    
+	wake_single = (flags & CRT_BLKPT_WAKE_ALL) == 0;
+	sched_blkpt_trigger(blkpt->id, CRT_BLKPT_EPOCH(saved + 1), wake_single);
 }
 
 /* Wake only a single, specified thread (tracked manually in the data-structure) */
