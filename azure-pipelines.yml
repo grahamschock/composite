@@ -1,0 +1,14 @@
+
+trigger:
+- master
+
+steps:
+- task: Docker@2
+  inputs:
+    command: 'build'
+    Dockerfile: 'tools/docker/Dockerfile'
+- script: |
+    cd src/
+    make
+    make run RUNSCRIPT=kernel_tests.sh run
+  displayName: 'Trying to build system'
