@@ -114,6 +114,7 @@ test_high_wakeup(void *data)
 		if (iters == TEST_ITERS) {
 			printc("\nTest done! (Duration: %llu ms)\n", sl_cyc2usec(sl_now() - start) / 1000);
 			printc("Deleting all threads. Idle thread should take over!\n");
+			exit();
 			sl_thd_free(t);
 			sl_thd_free(sl_thd_curr());
 
