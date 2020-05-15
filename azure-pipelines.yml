@@ -13,6 +13,5 @@ steps:
     cd src
     make init
     make
-    cp unit_schedlibtests.o llboot.o
-    ./cos_linker "llboot.o, :" ./gen_client_stub
+    make run RUNSCRIPT=unit_schedtests.sh run
   displayName: 'Trying to build system'
