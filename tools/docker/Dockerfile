@@ -38,4 +38,4 @@ RUN cd tmp &&\
 	cp -d usr/lib/i386-linux-gnu/lib* /usr/lib/i386-linux-gnu/ &&\
 	rm *.deb &&\
 	cd ..&&\
-	chmod 775 tmp
+	sudo chown -R $USER:$USER .
