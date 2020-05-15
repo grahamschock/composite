@@ -10,5 +10,6 @@ container: grahamschock/composite_dev_env:latest
 
 steps:
 - script: |
+    docker exec -u 0
     whoami
   displayName: 'Trying to build system'
