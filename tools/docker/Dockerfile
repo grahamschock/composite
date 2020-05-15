@@ -39,3 +39,4 @@ RUN cd tmp &&\
 	rm *.deb &&\
 	cd ..
 USER root
+RUN chmod a+rwx -R /tmp
