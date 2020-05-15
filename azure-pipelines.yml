@@ -10,10 +10,9 @@ container: grahamschock/composite_dev_env:latest
 
 steps:
 - script: |
-    chmod o+rwx /tmp
     cd src
     make init
     make
-    cd ../transfer
-    sh unit_schedtests.sh
+    cp unit_schedlibtests.o llboot.o
+    ./cos_linker "llboot.o, :" ./gen_client_stub
   displayName: 'Trying to build system'
