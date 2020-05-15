@@ -13,5 +13,4 @@ steps:
     cd src
     make init
     make
-    make run RUNSCRIPT=unit_schedtests.sh run
-  displayName: 'Trying to build system'
+  displayName: 'Build system'
