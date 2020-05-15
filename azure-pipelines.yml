@@ -2,12 +2,13 @@
 trigger:
 - master
 
+pool:
+  vmImage: 'composite_dev_env'
+
+container: grahamschock/composite_dev_env:latest
+
+
 steps:
-- task: Docker@2
-  inputs:
-    repository: 'grahamschock/composite_dev_env'
-    command: 'build'
-    Dockerfile: '**/Dockerfile'
 - script: |
     cd src/
     make init
