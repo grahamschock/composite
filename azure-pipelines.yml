@@ -3,7 +3,7 @@ trigger:
 - master
 
 pool:
-  vmImage: 'composite_dev_env'
+  vmImage: 'ubuntu-16.04'
 
 container: grahamschock/composite_dev_env:latest
 
