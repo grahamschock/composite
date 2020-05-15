@@ -14,5 +14,5 @@ steps:
     make init
     make
     cd ../transfer
-    sudo sh unit_schedtests.sh
+    sh unit_schedtests.sh
   displayName: 'Trying to build system'
