@@ -7,7 +7,6 @@ pool:
 
 container: grahamschock/composite_dev_env:latest
 
-
 steps:
 - script: |
     cd src
@@ -19,10 +18,7 @@ steps:
     make run RUNSCRIPT=unit_schedtests.sh run > output.txt
   timeoutInMinutes: 1
   displayName: 'Run Qemu'
-- script: |
-    cd src
-    cat output.txt
-  displayName: 'Showing Test Results'
+
 
 
 
