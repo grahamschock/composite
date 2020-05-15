@@ -9,6 +9,7 @@ steps:
     Dockerfile: 'tools/docker/Dockerfile'
 - script: |
     cd src/
+    make init
     make
     make run RUNSCRIPT=kernel_tests.sh run
   displayName: 'Trying to build system'
