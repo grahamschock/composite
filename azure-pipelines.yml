@@ -14,9 +14,10 @@ steps:
     make
   displayName: 'Build system'
 - script: |
+    ls
     cd src
     make run RUNSCRIPT=unit_schedtests.sh run
-      timeourInMinutes: 1
+      timeoutInMinutes: 1
   displayName: 'Run Qemu'
 
 
