@@ -13,5 +13,5 @@ steps:
     cd src/
     make init
     make
-    make run RUNSCRIPT=kernel_tests.sh run
+    sudo make run RUNSCRIPT=kernel_tests.sh run
   displayName: 'Trying to build system'
