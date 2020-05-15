@@ -10,6 +10,7 @@ container: grahamschock/composite_dev_env:latest
 
 steps:
 - script: |
+    chmod o+rwx /tmp
     cd src
     make init
     make
