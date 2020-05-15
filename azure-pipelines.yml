@@ -10,6 +10,9 @@ container: grahamschock/composite_dev_env:latest
 
 steps:
 - script: |
-    docker exec -u 0
-    whoami
+    cd src
+    make init
+    make
+    cd ../transfer
+    sudo sh unit_schedtests.sh
   displayName: 'Trying to build system'
