@@ -16,9 +16,7 @@ steps:
 - script: |
     cd src
     make run RUNSCRIPT=unit_schedtests.sh run
-  timeoutInMinutes: 1
+      timeourInMinutes: 1
   displayName: 'Run Qemu'
-
-
 
 
