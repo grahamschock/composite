@@ -16,7 +16,7 @@ steps:
 - script: |
     ls
     cd src
-    timeout 10 --preserve-status make run RUNSCRIPT=unit_schedtests.sh run
+    timeout --preserve-status 10 make run RUNSCRIPT=unit_schedtests.sh run
   displayName: 'Run Qemu'
 
 
