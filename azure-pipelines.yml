@@ -15,8 +15,11 @@ steps:
 - script: |
     ls
     cd src
-    timeout --preserve-status 10 make run RUNSCRIPT=unit_schedtests.sh run
+    timeout --preserve-status 10 make run RUNSCRIPT=kernel_tests.sh run > kernel_tests.txt
     exit 0
-  displayName: 'Run Qemu'
+  displayName: 'Run Qemu Kernel Tests'
+- script: |
+    cat kernel_tests.txt
+  displayName: 'Display Kernel Tests'
 
 
