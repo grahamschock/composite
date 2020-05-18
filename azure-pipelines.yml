@@ -16,9 +16,9 @@ steps:
       else 
         echo "KVM NOT ENABLED"
       fi
+  displayName: "KVM Check"
 - script: |
     cd src
-    make init
     make
   displayName: 'Build system'
 
@@ -30,41 +30,9 @@ steps:
 - script: |
     cat kernel_tests.txt
   displayName: 'Display Kernel Tests'
-  
-- task: PythonScript@0
-  inputs:
-    scriptSource: 'inline'
-    script: |
-      with open('kernel_tests.txt') as f:
-        if 'Kernel boot complete' in f.read():
-          print("Kernel Boot Complete")
-          exit(0)
-      print("Kernel Boot not Complete")
-      exit(1)
-  displayName: 'Check Kernel Boot'
 
 - task: PythonScript@0
   inputs:
-    scriptSource: 'inline'
-    script: |
-      with open('kernel_tests.txt') as f:
-        if '(0,1,0) 	One-Shot Timeout: 			Success' in f.read():
-          print("One-Shot Timeout Success")
-          exit(0)
-      print("One-Shot Timeout Failure")
-      exit(1)
-  displayName: 'Check One-Shot Timeout'
-
-- task: PythonScript@0
-  inputs:
-    scriptSource: 'inline'
-    script: |
-      with open('kernel_tests.txt') as f:
-        if '(0,1,0) 	Timer => Budget based: 			Success' in f.read():
-          print("Timer => Budget based Success");
-          exit(0)
-      print("Timer => Budget based Failure")
-      exit(1)
-  displayName: 'Check One-Shot Timeout'
-
+    scriptSource: 'filePath'
+    scriptPath: 'tools/kernel_parse.py'
 
