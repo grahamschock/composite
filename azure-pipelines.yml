@@ -27,8 +27,8 @@ steps:
     scriptSource: 'inline'
     script: |
       with open('kernel_tests.txt') as f:
-        if 'Kernel boot complete' in f.read():
-         exit(0)
+        if 'Kernel boot not complete' in f.read():
+          exit(0)
       exit(1)
   displayName: 'Check Kernel Boot'
 
