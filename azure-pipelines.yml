@@ -11,7 +11,6 @@ steps:
     cd src
     make init
     make
-    exit 1
   displayName: 'Build system'
 - script: |
     ls
