@@ -37,5 +37,10 @@ RUN cd tmp &&\
 	tar -xvf data.tar.* &&\
 	cp -d usr/lib/i386-linux-gnu/lib* /usr/lib/i386-linux-gnu/ &&\
 	rm *.deb &&\
-	cd ..
+	cd .. &&\
+	apt-get update &&\
+	apt-get install kvm qemu-kvm libvirt-bin virtinst &&\
+	apt install virt-manager && \
+	adduser `id -un` libvirt && \
+	adduser `id -un` kvm && \
 RUN chmod a+rwx -R /tmp
