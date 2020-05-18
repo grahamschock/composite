@@ -11,11 +11,6 @@ steps:
   inputs:
     targetType: 'inline'
     script: |
-      apt-get update
-      apt-get install kvm qemu-kvm libvirt-bin virtinst
-      apt install virt-manager 
-      adduser `id -un` libvirt
-      adduser `id -un` kvm
       if [ -e "/dev/kvm" ] && [ -r "/dev/kvm" ] && [ -w "/dev/kvm" ]; then
         echo "KVM ENABLED"
       else 
