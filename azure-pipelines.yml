@@ -30,6 +30,5 @@ steps:
         if 'Kernel boot complete' in f.read():
          exit(0)
        exit(1)
-      displayName: 'Kernel Parse'
 
 
