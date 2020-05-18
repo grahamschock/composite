@@ -1,5 +1,5 @@
 test_failure = False;
-with open("../src/kernel_tests.txt", "r") as f:
+with open("src/kernel_tests.txt", "r") as f:
     for line in f:
         l = line.strip()
         if("Failure" in l):
