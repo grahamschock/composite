@@ -19,6 +19,7 @@ steps:
   displayName: "KVM Check"
 - script: |
     cd src
+    make init
     make
   displayName: 'Build system'
 
