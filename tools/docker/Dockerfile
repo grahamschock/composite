@@ -37,6 +37,5 @@ RUN cd tmp &&\
 	tar -xvf data.tar.* &&\
 	cp -d usr/lib/i386-linux-gnu/lib* /usr/lib/i386-linux-gnu/ &&\
 	rm *.deb &&\
-	cd .. &&\
 RUN chmod a+rwx -R /tmp
 
