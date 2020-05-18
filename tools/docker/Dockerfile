@@ -38,6 +38,5 @@ RUN cd tmp &&\
 	cp -d usr/lib/i386-linux-gnu/lib* /usr/lib/i386-linux-gnu/ &&\
 	rm *.deb &&\
 	cd .. &&\
-USER root
 RUN chmod a+rwx -R /tmp
 

@@ -1,15 +1,75 @@
-
 trigger:
-- master
+- '*'
+
+pool:
+  vmImage: 'ubuntu-16.04'
+
+container: grahamschock/composite_dev_env:latest
 
 steps:
-- task: Docker@2
+- task: Bash@3
   inputs:
-    command: 'build'
-    Dockerfile: 'tools/docker/Dockerfile'
+    targetType: 'inline'
+    script: |
+      apt-get update
+      apt-get install kvm qemu-kvm libvirt-bin virtinst
+      apt install virt-manager 
+      adduser `id -un` libvirt
+      adduser `id -un` kvm
+      if [ -e "/dev/kvm" ] && [ -r "/dev/kvm" ] && [ -w "/dev/kvm" ]; then
+        echo "KVM ENABLED"
+      else 
+        echo "KVM NOT ENABLED"
+      fi
 - script: |
-    cd src/
+    cd src
     make init
     make
-    make run RUNSCRIPT=kernel_tests.sh run
-  displayName: 'Trying to build system'
+  displayName: 'Build system'
+
+- script: |
+    cd src
+    timeout --preserve-status 10 make run RUNSCRIPT=kernel_tests.sh run > ../kernel_tests.txt
+    exit 0
+  displayName: 'Run Qemu Kernel Tests'
+- script: |
+    cat kernel_tests.txt
+  displayName: 'Display Kernel Tests'
+  
+- task: PythonScript@0
+  inputs:
+    scriptSource: 'inline'
+    script: |
+      with open('kernel_tests.txt') as f:
+        if 'Kernel boot complete' in f.read():
+          print("Kernel Boot Complete")
+          exit(0)
+      print("Kernel Boot not Complete")
+      exit(1)
+  displayName: 'Check Kernel Boot'
+
+- task: PythonScript@0
+  inputs:
+    scriptSource: 'inline'
+    script: |
+      with open('kernel_tests.txt') as f:
+        if '(0,1,0) 	One-Shot Timeout: 			Success' in f.read():
+          print("One-Shot Timeout Success")
+          exit(0)
+      print("One-Shot Timeout Failure")
+      exit(1)
+  displayName: 'Check One-Shot Timeout'
+
+- task: PythonScript@0
+  inputs:
+    scriptSource: 'inline'
+    script: |
+      with open('kernel_tests.txt') as f:
+        if '(0,1,0) 	Timer => Budget based: 			Success' in f.read():
+          print("Timer => Budget based Success");
+          exit(0)
+      print("Timer => Budget based Failure")
+      exit(1)
+  displayName: 'Check One-Shot Timeout'
+
+
