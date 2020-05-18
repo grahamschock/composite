@@ -46,4 +46,16 @@ steps:
       exit(1)
   displayName: 'Check One-Shot Timeout'
 
+- task: PythonScript@0
+  inputs:
+    scriptSource: 'inline'
+    script: |
+      with open('kernel_tests.txt') as f:
+        if '(0,1,0) 	Timer => Budget based: 			Success' in f.read():
+          print("Timer => Budget based Success");
+          exit(0)
+      print("Timer => Budget based Failure")
+      exit(1)
+  displayName: 'Check One-Shot Timeout'
+
 
