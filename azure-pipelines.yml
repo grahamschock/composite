@@ -11,6 +11,7 @@ steps:
   inputs:
     targetType: 'inline'
     script: |
+      egrep -c '(vmx|svm)' /proc/cpuinfo
       if [ -e "/dev/kvm" ] && [ -r "/dev/kvm" ] && [ -w "/dev/kvm" ]; then
         echo "KVM ENABLED"
       else 
