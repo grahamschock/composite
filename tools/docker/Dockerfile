@@ -39,4 +39,5 @@ RUN cd tmp &&\
 	rm *.deb &&\
 	cd ..
 RUN chmod a+rwx -R /tmp
+RUN apt-get -y update && DEBIAN_FRONTEND=noninteractive apt-get -y install kvm qemu-kvm libvirt-bin bridge-utils libguestfs-tools
 
