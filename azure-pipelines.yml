@@ -1,42 +1,40 @@
 trigger:
-- '*'
+  - "*"
 
 pool:
-  vmImage: 'ubuntu-16.04'
+  vmImage: "ubuntu-16.04"
 
 container: grahamschock/composite_dev_env:latest
 
 steps:
-- task: Bash@3
-  inputs:
-    targetType: 'inline'
-    script: |
-      egrep -c '(vmx|svm)' /proc/cpuinfo
-      if [ -e "/dev/kvm" ] && [ -r "/dev/kvm" ] && [ -w "/dev/kvm" ]; then
-        echo "KVM ENABLED"
-      else 
-        echo "KVM NOT ENABLED"
-      fi
-  displayName: "KVM Check"
-- script: |
-    cd src
-    make init
-    make
-  displayName: 'Build system'
+  - task: Bash@3
+    inputs:
+      targetType: "inline"
+      script: |
+        egrep -c '(vmx|svm)' /proc/cpuinfo
+        if [ -e "/dev/kvm" ] && [ -r "/dev/kvm" ] && [ -w "/dev/kvm" ]; then
+          echo "KVM ENABLED"
+        else 
+          echo "KVM NOT ENABLED"
+        fi
+    displayName: "KVM Check"
+  - script: |
+      cd src
+      make init
+      make
+    displayName: "Build system"
 
-- script: |
-    cd src
-    timeout --preserve-status 10 make run RUNSCRIPT=kernel_tests.sh run > ../kernel_tests.txt
-    exit 0
-  displayName: 'Run Qemu Kernel Tests'
-- script: |
-    cat kernel_tests.txt
-  displayName: 'Display Kernel Tests'
+  - script: |
+      cd src
+      timeout --preserve-status 10 make run RUNSCRIPT=kernel_tests.sh run > ../kernel_tests.txt
+      exit 0
+    displayName: "Run Qemu Kernel Tests"
+  - script: |
+      cat kernel_tests.txt
+    displayName: "Display Kernel Tests"
 
-- task: PythonScript@0
-  inputs:
-    scriptSource: 'filePath'
-    scriptPath: 'tools/kernel_parse.py'
-  displayName: "Parse Kernel Kernel Tests"
-
-
+  - task: PythonScript@0
+    inputs:
+      scriptSource: "filePath"
+      scriptPath: "tools/kernel_parse.py"
+    displayName: "Parse Kernel Kernel Tests"
