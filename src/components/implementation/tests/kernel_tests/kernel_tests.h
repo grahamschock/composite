@@ -56,30 +56,30 @@ extern unsigned long    thd_test[TEST_NTHDS];
 extern int              num, den, count;
 
 struct results {
-        long long unsigned avg;
-        long long unsigned max;
-        long long unsigned min;
-        long long unsigned sd;
-        int                sz;
-        long long unsigned p90tile;
-        long long unsigned p95tile;
-        long long unsigned p99tile;
+    long long unsigned avg;
+    long long unsigned max;
+    long long unsigned min;
+    long long unsigned sd;
+    int                sz;
+    long long unsigned p90tile;
+    long long unsigned p95tile;
+    long long unsigned p99tile;
 };
 
 static unsigned long
 tls_get(size_t off)
 {
-        unsigned long val;
+    unsigned long val;
 
-        __asm__ __volatile__("movl %%gs:(%1), %0" : "=r"(val) : "r"(off) :);
+    __asm__ __volatile__("movl %%gs:(%1), %0" : "=r"(val) : "r"(off) :);
 
-        return val;
+    return val;
 }
 
 static void
 tls_set(size_t off, unsigned long val)
 {
-        __asm__ __volatile__("movl %0, %%gs:(%1)" : : "r"(val), "r"(off) : "memory");
+    __asm__ __volatile__("movl %0, %%gs:(%1)" : : "r"(val), "r"(off) : "memory");
 }
 
 extern void test_run_perf_kernel(void);
