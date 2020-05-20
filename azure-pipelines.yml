@@ -14,7 +14,7 @@ steps:
         egrep -c '(vmx|svm)' /proc/cpuinfo
         if [ -e "/dev/kvm" ] && [ -r "/dev/kvm" ] && [ -w "/dev/kvm" ]; then
           echo "KVM ENABLED"
-        else 
+        else
           echo "KVM NOT ENABLED"
         fi
     displayName: "KVM Check"
