@@ -22,109 +22,109 @@ pgtblcap_t    boot_captbl_self_untyped_pt = BOOT_CAPTBL_SELF_UNTYPED_PT;
 sched_param_t
 sched_param_pack_rs(sched_param_type_t type, unsigned int value)
 {
-    return sched_param_pack(type, value);
+	return sched_param_pack(type, value);
 }
 
 struct sl_thd *
 sl_thd_curr_rs()
 {
-    return sl_thd_curr();
+	return sl_thd_curr();
 }
 
 thdid_t
 sl_thdid_rs()
 {
-    return sl_thdid();
+	return sl_thdid();
 }
 
 thdid_t
 sl_thd_thdid_rs(struct sl_thd *thd)
 {
-    return sl_thd_thdid(thd);
+	return sl_thd_thdid(thd);
 }
 
 struct sl_thd *
 sl_thd_lkup_rs(thdid_t tid)
 {
-    return sl_thd_lkup(tid);
+	return sl_thd_lkup(tid);
 }
 
 microsec_t
 sl_cyc2usec_rs(cycles_t cyc)
 {
-    return sl_cyc2usec(cyc);
+	return sl_cyc2usec(cyc);
 }
 
 cycles_t
 sl_usec2cyc_rs(microsec_t usec)
 {
-    return sl_usec2cyc(usec);
+	return sl_usec2cyc(usec);
 }
 
 cycles_t
 sl_now_rs()
 {
-    return sl_now();
+	return sl_now();
 }
 
 microsec_t
 sl_now_usec_rs()
 {
-    return sl_now_usec();
+	return sl_now_usec();
 }
 
 void
 sl_lock_take_rs(struct sl_lock *lock)
 {
-    return sl_lock_take(lock);
+	return sl_lock_take(lock);
 }
 
 void
 sl_lock_release_rs(struct sl_lock *lock)
 {
-    return sl_lock_release(lock);
+	return sl_lock_release(lock);
 }
 
 /* This is a bit of a hack, but we setup pthread data for sl threads */
 #define _NSIG 65
 
 struct pthread {
-    struct pthread *self;
-    void **dtv, *unused1, *unused2;
-    uintptr_t sysinfo;
-    uintptr_t canary, canary2;
-    pid_t tid, pid;
-    int tsd_used, errno_val;
-    volatile int cancel, canceldisable, cancelasync;
-    int detached;
-    unsigned char *map_base;
-    size_t map_size;
-    void *stack;
-    size_t stack_size;
-    void *start_arg;
-    void *(*start)(void *);
-    void *result;
-    struct __ptcb *cancelbuf;
-    void **tsd;
-    pthread_attr_t attr;
-    volatile int dead;
-    struct {
-        volatile void *volatile head;
-        long off;
-        volatile void *volatile pending;
-    } robust_list;
-    int unblock_cancel;
-    volatile int timer_id;
-    locale_t locale;
-    volatile int killlock[2];
-    volatile int exitlock[2];
-    volatile int startlock[2];
-    unsigned long sigmask[_NSIG/8/sizeof(long)];
-    char *dlerror_buf;
-    int dlerror_flag;
-    void *stdio_locks;
-    uintptr_t canary_at_end;
-    void **dtv_copy;
+	struct pthread *self;
+	void **         dtv, *unused1, *unused2;
+	uintptr_t       sysinfo;
+	uintptr_t       canary, canary2;
+	pid_t           tid, pid;
+	int             tsd_used, errno_val;
+	volatile int    cancel, canceldisable, cancelasync;
+	int             detached;
+	unsigned char * map_base;
+	size_t          map_size;
+	void *          stack;
+	size_t          stack_size;
+	void *          start_arg;
+	void *(*start)(void *);
+	void *         result;
+	struct __ptcb *cancelbuf;
+	void **        tsd;
+	pthread_attr_t attr;
+	volatile int   dead;
+	struct {
+		volatile void *volatile head;
+		long off;
+		volatile void *volatile pending;
+	} robust_list;
+	int           unblock_cancel;
+	volatile int  timer_id;
+	locale_t      locale;
+	volatile int  killlock[2];
+	volatile int  exitlock[2];
+	volatile int  startlock[2];
+	unsigned long sigmask[_NSIG / 8 / sizeof(long)];
+	char *        dlerror_buf;
+	int           dlerror_flag;
+	void *        stdio_locks;
+	uintptr_t     canary_at_end;
+	void **       dtv_copy;
 };
 
 struct pthread backing_thread_data[SL_MAX_NUM_THDS];
@@ -133,17 +133,17 @@ void *         thread_data[SL_MAX_NUM_THDS];
 void
 assign_thread_data(struct sl_thd *thread)
 {
-    struct cos_compinfo *ci     = cos_compinfo_get(cos_defcompinfo_curr_get());
-    thdcap_t             thdcap = sl_thd_thdcap(thread);
-    thdid_t              thdid  = sl_thd_thdid(thread);
+	struct cos_compinfo *ci     = cos_compinfo_get(cos_defcompinfo_curr_get());
+	thdcap_t             thdcap = sl_thd_thdcap(thread);
+	thdid_t              thdid  = sl_thd_thdid(thread);
 
-    /* HACK: We setup some thread specific data to make musl stuff work with sl threads */
-    backing_thread_data[thdid].tid = thdid;
-    backing_thread_data[thdid].robust_list.head = &backing_thread_data[thdid].robust_list.head;
-    backing_thread_data[thdid].tsd = calloc(PTHREAD_KEYS_MAX, sizeof(void*));
+	/* HACK: We setup some thread specific data to make musl stuff work with sl threads */
+	backing_thread_data[thdid].tid              = thdid;
+	backing_thread_data[thdid].robust_list.head = &backing_thread_data[thdid].robust_list.head;
+	backing_thread_data[thdid].tsd              = calloc(PTHREAD_KEYS_MAX, sizeof(void *));
 
-    thread_data[thdid] = &backing_thread_data[thdid];
-    cos_thd_mod(ci, thdcap, &thread_data[thdid]);
+	thread_data[thdid] = &backing_thread_data[thdid];
+	cos_thd_mod(ci, thdcap, &thread_data[thdid]);
 }
 
 extern void rust_init();
@@ -151,7 +151,7 @@ extern void rust_init();
 void
 cos_init()
 {
-    printc("Entering rust!\n");
-    rust_init();
-    assert(0);
+	printc("Entering rust!\n");
+	rust_init();
+	assert(0);
 }
