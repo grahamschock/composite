@@ -1,4 +1,4 @@
-test_failure = False;
+test_failure = False
 with open("kernel_tests.txt", "r") as f:
     for line in f:
         l = line.strip()
@@ -10,4 +10,3 @@ if(test_failure == True):
     exit(1)
 print("All Tests Passed")
 exit(0)
-
