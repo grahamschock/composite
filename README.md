@@ -1,57 +1,54 @@
-The _Composite_ Component-Based OS
-==================================
+# The _Composite_ Component-Based OS
 
 [![Build Status](https://dev.azure.com/gschock/Composite%20CI/_apis/build/status/grahamschock.composite?branchName=ppos)](https://dev.azure.com/gschock/Composite%20CI/_build/latest?definitionId=1&branchName=ppos)
 
-This is the source code for the _Composite_ component-based OS.  Even
-low-level system policies such as scheduling, memory mapping, and
-synchronization are defined as discrete user-level components.  Each
-component exports an interface used to harness its functionality, and
-components are composed together to form an executable system.
+This is the source code for the _Composite_ component-based OS. Even low-level
+system policies such as scheduling, memory mapping, and synchronization are
+defined as discrete user-level components. Each component exports an interface
+used to harness its functionality, and components are composed together to form
+an executable system.
 
-Please see http://composite.seas.gwu.edu for publications and
-more information.
+Please see http://composite.seas.gwu.edu for publications and more information.
 
-Branches
---------
+## Branches
 
 - `master` is the original system with a full user-level set of components.
 - `ppos` is the Speck kernel emphasizing scalable predictability.
-- `tcaps` has mainly been integrated into `ppos`, but a few unrelated pieces remain.
+- `tcaps` has mainly been integrated into `ppos`, but a few unrelated pieces
+  remain.
 
-Research features of _Composite_
---------------------------------
+## Research features of _Composite_
 
-See a summary of the research directions of _Composite_ at http://composite.seas.gwu.edu.
+See a summary of the research directions of _Composite_ at
+http://composite.seas.gwu.edu.
 
-Where to start -- a tour of the source code
--------------------------------------------
+## Where to start -- a tour of the source code
 
-- Please read the _Composite_ [posts](http://www.seas.gwu.edu/~gparmer/posts.html).
+- Please read the _Composite_
+  [posts](http://www.seas.gwu.edu/~gparmer/posts.html).
 
-- Join the compositeos@googlegroups.com mailing list.
-    We use a #slack for our internal development, so this is exceedingly low throughput (1 email every 6 months).
+- Join the compositeos@googlegroups.com mailing list. We use a #slack for our
+  internal development, so this is exceedingly low throughput (1 email every 6
+  months).
 
-- To run *Composite*, you start by reading the installation and usage
-  summary in `docs/installation_usage_summary.md`.
+- To run _Composite_, you start by reading the installation and usage summary in
+  `docs/installation_usage_summary.md`.
 
-_Composite_ system support
---------------------------
+## _Composite_ system support
 
 - x86-32
 - Qemu with 32 bit, x86 support
 
-Important note
---------------
+## Important note
 
-**The code is pre-alpha quality.  Some parts are quite solid, many
-  others are absolutely not.  Please consult with us to determine if
-  it is right for your use-case.**
+**The code is pre-alpha quality. Some parts are quite solid, many others are
+absolutely not. Please consult with us to determine if it is right for your
+use-case.**
 
-Licensing
----------
+## Licensing
 
-This code is licensed under the GPL version 2.0 with the class path exception unless otherwise noted (significant portions of user-level are BSD):
+This code is licensed under the GPL version 2.0 with the class path exception
+unless otherwise noted (significant portions of user-level are BSD):
 
 ```
 The Composite Component-Based OS
@@ -89,16 +86,13 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ```
 
-This license is not set in stone, and we would be willing to negotiate
-on a case-by-case basis for more business-friendly terms.  The license
-should not prevent you from using this OS, as alternatives can be
-arranged.  It _should_ prevent you from stealing the work and claiming
-it as your own.
+This license is not set in stone, and we would be willing to negotiate on a
+case-by-case basis for more business-friendly terms. The license should not
+prevent you from using this OS, as alternatives can be arranged. It _should_
+prevent you from stealing the work and claiming it as your own.
 
-Support
--------
+## Support
 
-We'd like to sincerely thank our sponsors.  The _Composite_
-Component-Based OS development effort has been supported by grants
-from the National Science Foundation (NSF) under awards `CNS 1137973`,
-`CNS 1149675`, and `CNS 1117243`.
+We'd like to sincerely thank our sponsors. The _Composite_ Component-Based OS
+development effort has been supported by grants from the National Science
+Foundation (NSF) under awards `CNS 1137973`, `CNS 1149675`, and `CNS 1117243`.
