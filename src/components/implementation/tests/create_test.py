@@ -53,7 +53,7 @@ file_contents = """#include <cos_component.h>
 void
 cos_init(void)
 {
-	printc("Hello world!\n");
+	printc("Default Test Running!");
 	while (1) ;
 }
 """
