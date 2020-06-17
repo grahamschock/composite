@@ -1,7 +1,7 @@
 The _Composite_ Component-Based OS
 ==================================
 
-[![Build Status](https://dev.azure.com/gschock/Composite%20CI/_apis/build/status/grahamschock.composite?branchName=ppos)](https://dev.azure.com/gschock/Composite%20CI/_build/latest?definitionId=1&branchName=ppos)
+[![Build Status](https://dev.azure.com/gschock/Composite%20CI/_apis/build/status/grahamschock.composite?branchName=ppos)](https://dev.azure.com/gschock/Composite%20CI/_build/latest?definitionId=1&branchName=crt)
 
 This is the source code for the _Composite_ component-based OS.  Even
 low-level system policies such as scheduling, memory mapping, and
