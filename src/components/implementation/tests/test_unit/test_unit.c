@@ -19,6 +19,9 @@ void test_function_should_doAlsoDoBlah(void) {
   TEST_ASSERT_EQUAL(1,2);
 }
 
+void fake_function(void) {
+  TEST_ASSERT_EQUAL(2,2);
+}
 void
 cos_init(void)
 {
