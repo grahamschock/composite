@@ -4,3 +4,9 @@
 [submodule "src/components/lib/ck/ck"]
 	path = src/components/lib/ck/ck
 	url = https://github.com/gwsystems/ck.git
+[submodule "src/components/include/cbdd"]
+	path = src/components/include/cbdd
+	url = https://github.com/nassersala/cbdd.git
+[submodule "src/components/lib/cmocka"]
+	path = src/components/lib/cmocka
+	url = https://git.cryptomilk.org/projects/cmocka.git/
