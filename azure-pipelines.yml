@@ -53,5 +53,6 @@ steps:
     scriptSource: 'filePath'
     scriptPath: 'src/components/implementation/tests/test_unit/test_unit_parse.py'
   displayName: "Parse Unit Tests"
+  condition: always()
 
 
