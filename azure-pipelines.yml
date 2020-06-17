@@ -32,11 +32,26 @@ steps:
 - script: |
     cat kernel_tests.txt
   displayName: 'Display Kernel Tests'
+- script: |
+    cd src
+    timeout --preserve-status 10 make run RUNSCRIPT=test_unit.sh run > ../test_unit.txt
+    exit 0
+  displayName: 'Run Qemu Unit Tests'
+- script: |
+    cat test_unit.txt
+  displayName: 'Display Unit Tests'
+
 
 - task: PythonScript@0
   inputs:
     scriptSource: 'filePath'
     scriptPath: 'tools/kernel_parse.py'
   displayName: "Parse Kernel Kernel Tests"
+
+- task: PythonScript@0
+  inputs:
+    scriptSource: 'filePath'
+    scriptPath: 'src/components/implementation/tests/test_unit/test_unit_parse.py'
+  displayName: "Parse Unit Tests"
 
 
