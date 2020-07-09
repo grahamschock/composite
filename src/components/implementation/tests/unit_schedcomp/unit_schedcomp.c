@@ -6,7 +6,6 @@
 
 #include <llprint.h>
 #include <res_spec.h>
-#include <hypercall.h>
 #include <sched.h>
 #include <cos_time.h>
 
@@ -18,7 +17,6 @@
 #define HIGH_PRIORITY (LOWEST_PRIORITY - 10)
 
 static int lowest_was_scheduled[NUM_CPU];
-static u32_t cycs_per_usec = 0;
 
 static void
 low_thread_fn()
@@ -118,17 +116,12 @@ run_tests()
 	SPIN();
 }
 
-void
-cos_init(void)
+int
+main(void)
 {
 	thdid_t testtid;
-	spdid_t child;
-	comp_flag_t childflag;
-
-	cycs_per_usec = cos_hw_cycles_per_usec(BOOT_CAPTBL_SELF_INITHW_BASE);
 
 	PRINTLOG(PRINT_DEBUG, "Unit-test scheduling manager component\n");
-	assert(hypercall_comp_child_next(cos_spd_id(), &child, &childflag) == -1);
 
 	testtid = sched_thd_create(run_tests, NULL);
 	sched_thd_param_set(testtid, sched_param_pack(SCHEDP_PRIO, LOWEST_PRIORITY));
@@ -140,7 +133,5 @@ cos_init(void)
 		sched_thd_block_timeout(0, wakeup);
 	}
 
-	/* should never get here */
-	PRINTLOG(PRINT_ERROR, "Cannot reach here!\n");
-	assert(0);
+	return 0;
 }

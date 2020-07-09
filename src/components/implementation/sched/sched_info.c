@@ -8,15 +8,14 @@
 #include <cos_kernel_api.h>
 #include <ps.h>
 #include <sched_info.h>
-#include <hypercall.h>
 #include <sl.h>
+#include <initargs.h>
 
 #define SCHED_MAX_CHILD_COMPS 8
 static struct sched_childinfo childinfo[NUM_CPU][SCHED_MAX_CHILD_COMPS];
 static unsigned int sched_num_child[NUM_CPU] CACHE_ALIGNED;
 static unsigned int sched_num_childsched[NUM_CPU] CACHE_ALIGNED;
 
-unsigned int self_init[NUM_CPU] CACHE_ALIGNED, num_child_init[NUM_CPU] CACHE_ALIGNED;
 
 /* implementation specific initialization per child */
 extern void sched_child_init(struct sched_childinfo *schedci);
@@ -70,45 +69,70 @@ sched_num_childsched_get(void)
 	return sched_num_childsched[cos_cpuid()];
 }
 
+extern void schedinit_next(compid_t cid);
+
+struct sl_thd *
+sched_childinfo_init_component(compid_t id)
+{
+	spdid_t child                     = id;
+	comp_flag_t childflags            = 0;
+	struct cos_defcompinfo *child_dci = NULL;
+	struct sched_childinfo *schedinfo = NULL;
+	struct sl_thd          *initthd   = NULL;
+	compcap_t               compcap   = 0;
+	int cpu;
+
+	schedinfo = sched_childinfo_alloc(child, compcap, childflags);
+	assert(schedinfo);
+	child_dci = sched_child_defci_get(schedinfo);
+	assert(child_dci && child_dci->id != 0);
+	for (cpu = 0; cpu < NUM_CPU; cpu++) {
+		bitmap_set(schedinfo->cpubmp, cpu);
+	}
+
+	assert(bitmap_check(schedinfo->cpubmp, cos_cpuid()));
+	initthd = sl_thd_initaep_alloc(child_dci, NULL, childflags & COMP_FLAG_SCHED, childflags & COMP_FLAG_SCHED ? 1 : 0, 0, 0, 0); /* TODO: rate information */
+	assert(initthd); 	/* Failure here? Capability manager likely needs to be depended on with capmgr_create */
+	sched_child_initthd_set(schedinfo, initthd);
+
+	sched_child_init(schedinfo);
+	if (childflags & COMP_FLAG_SCHED) ps_faa((unsigned long *)&sched_num_childsched[cos_cpuid()], 1);
+
+	printc("\tSched %ld: creating thread %ld for component %ld.\n", cos_compid(), sl_thd_thdid(initthd), id);
+
+	return initthd;
+}
+
 static void
 sched_childinfo_init_intern(int is_raw)
 {
-	int remaining = 0;
-	spdid_t child;
-	comp_flag_t childflags;
+	struct initargs exec_entries, curr;
+	struct initargs_iter i;
+	int ret, cont;
+
+	assert(!is_raw);
 
 	memset(childinfo[cos_cpuid()], 0, sizeof(struct sched_childinfo) * SCHED_MAX_CHILD_COMPS);
 
-	while ((remaining = hypercall_comp_child_next(cos_spd_id(), &child, &childflags)) >= 0) {
-		struct cos_defcompinfo *child_dci = NULL;
-		struct sched_childinfo *schedinfo = NULL;
-		struct sl_thd          *initthd   = NULL;
-		compcap_t               compcap   = 0;
+	/* Create execution in the relevant components */
+	ret = args_get_entry("execute", &exec_entries);
+	assert(!ret);
+	printc("\tSched %ld: %d components that need execution\n", cos_compid(), args_len(&exec_entries));
+	for (cont = args_iter(&exec_entries, &i, &curr) ; cont ; cont = args_iter_next(&i, &curr)) {
+		int      keylen;
+		compid_t id        = atoi(args_key(&curr, &keylen));
+		char    *exec_type = args_value(&curr);
 
-		if (is_raw) {
-			compcap = hypercall_comp_compcap_get(child);
-			assert(compcap);
+		assert(exec_type);
+		assert(id != cos_compid());
+
+		/* Only init threads allowed */
+		if (strcmp(exec_type, "init")) {
+			BUG();	/* TODO: no support for hierarchical scheduling yet */
 		}
 
-		schedinfo = sched_childinfo_alloc(child, compcap, childflags);
-		assert(schedinfo);
-		child_dci = sched_child_defci_get(schedinfo);
-		hypercall_comp_cpubitmap_get(child, schedinfo->cpubmp);
-
-		if (bitmap_check(schedinfo->cpubmp, cos_cpuid())) {
-			PRINTLOG(PRINT_DEBUG, "Initializing child component %u, is_sched=%d\n", child, childflags & COMP_FLAG_SCHED);
-			initthd = sl_thd_initaep_alloc(child_dci, NULL, childflags & COMP_FLAG_SCHED, childflags & COMP_FLAG_SCHED ? 1 : 0, 0, 0, 0); /* TODO: rate information */
-			assert(initthd);
-			sched_child_initthd_set(schedinfo, initthd);
-
-			sched_child_init(schedinfo);
-			if (childflags & COMP_FLAG_SCHED) ps_faa((unsigned long *)&sched_num_childsched[cos_cpuid()], 1);
-		}
-
-		if (!remaining) break;
+		schedinit_next(id);
 	}
-
-	assert(sched_num_child_get()); /* at least 1 child component */
 }
 
 void

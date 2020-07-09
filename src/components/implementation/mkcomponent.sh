@@ -15,7 +15,7 @@ fi
 
 if [ -f "$1" ]
 then
-    echo "Cannot create component interface $1: already exists as a file"
+    echo "Cannot create component interface $1: already exists as a file."
     exit
 fi
 
@@ -25,8 +25,21 @@ then
     cp skel/Makefile $1/
 fi
 
+if [ -f "$1/$COMPNAME" ]
+then
+    echo "Cannot create component at $1/$COMPNAME: already exists as a file."
+    exit
+fi
+
+if [ -d "$1/$COMPNAME" ]
+then
+    echo "Cannot create component at $1/$COMPNAME: already exists."
+    exit
+fi
+
 mkdir $1/$COMPNAME
 cp skel/default/* $1/$COMPNAME/
 mv $1/$COMPNAME/default.c $1/$COMPNAME/$COMPNAME.c
-sed -i 's/SKEL_COMP/'`echo $COMPNAME`'/g' $1/$COMPNAME/Makefile
+sed -i 's/SKEL_IF/'`echo $1`'/g' $1/Makefile
 sed -i 's/SKEL_IF/'`echo $1`'/g' $1/$COMPNAME/Makefile
+sed -i 's/SKEL/'`echo $1`'/g' $1/$COMPNAME/doc.md
