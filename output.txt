@@ -1,0 +1,3 @@
+[cos executing] tools/run.sh system_binaries/cos_build-test/cos.img
+QEMU: Terminated
+
