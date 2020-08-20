@@ -1,4 +1,5 @@
 FROM ubuntu:18.04
+RUN RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 RUN dpkg --add-architecture i386 &&\
 	apt-get -y update &&\
 	apt-get -y install \
@@ -40,4 +41,4 @@ RUN cd tmp &&\
 	cd ..
 RUN chmod a+rwx -R /tmp
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
-
+RUN source $HOME/.cargo/env
