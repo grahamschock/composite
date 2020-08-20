@@ -39,4 +39,5 @@ RUN cd tmp &&\
 	rm *.deb &&\
 	cd ..
 RUN chmod a+rwx -R /tmp
+RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
 
